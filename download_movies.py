@@ -12,15 +12,27 @@ from selenium.common.exceptions import TimeoutException
 link ="http://dayt.se/forum"
 
 #url=urllib.urlopen(link)
-opener = urllib2.build_opener()
-opener.addheaders = [('User-agent', 'Opera/9.25')]
+def initialize_opener():
+	"""
+	Initializes the opener object adds header content and returns it 
+	"""
+	opener = urllib2.build_opener()
+	opener.addheaders = [('User-agent', 'Opera/9.25')]
+	return opener
 
 #url = opener.open(link+"/forum.php")
-request = urllib2.Request(link+"/forum.php")
-content=opener.open(request).read()
+def read_content(link,opener):
+	"""
+	Reads the content for the given link and returns it :)
+
+	"""
+	request = urllib2.Request()
+	content=opener.open(request).read()
+	return content
 
 #print content
-
+opener=initialize_opener()
+content=read_content(link+"/forum.php",opener)
 soup=BeautifulSoup(content,'html.parser')
 
 series_list=[]
@@ -39,12 +51,9 @@ seriesno=int(raw_input())
 series=series_list[seriesno-1]
 link_ep=series[1]
 
-opener = urllib2.build_opener()
-opener.addheaders = [('User-agent', 'Opera/9.25')]
-
+content=read_content(link_ep,opener)
 #url = opener.open(link+"/forum.php")
-request = urllib2.Request(link_ep)
-content=opener.open(request).read()
+
 episode_list=[]
 soup=BeautifulSoup(content,'html.parser')
 for sec in soup.find_all('a',attrs={'class':'title'}):
@@ -58,12 +67,8 @@ for episode in episode_list:
 print "Enter episode no: to download:"
 episodeno=int(raw_input())
 link_dwn=episode_list[episodeno-1][1]	
-opener = urllib2.build_opener()
-opener.addheaders = [('User-agent', 'Opera/9.25')]
 
-#url = opener.open(link+"/forum.php")
-request = urllib2.Request(link_dwn)
-content=opener.open(request).read()
+content=read_content(link_dwn,opener)
 soup=BeautifulSoup(content,'html.parser')
 down=soup.find('a',attrs={'id':'dm3'})
 print down.get('href')
